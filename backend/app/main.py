@@ -1,14 +1,22 @@
 from fastapi import FastAPI
 from sqlalchemy import text
 
-from app.database.connection import engine
+from app.api.products import router as products_router
+from app.database.connection import Base, engine
+from app.models import Product
+
+
+Base.metadata.create_all(bind=engine)
 
 
 app = FastAPI(
     title="Pharmacy Management API",
     description="REST API for pharmacy inventory management.",
-    version="0.2.0",
+    version="0.3.0",
 )
+
+
+app.include_router(products_router)
 
 
 @app.get("/")
