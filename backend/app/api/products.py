@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
 from app.database.session import get_db
@@ -12,6 +12,8 @@ from app.services.product_service import (
     delete_existing_product,
     get_existing_product,
     list_all_products,
+    list_expiring_products,
+    list_low_stock_products,
     update_existing_product,
 )
 
@@ -42,9 +44,39 @@ def create_product_endpoint(
     response_model=list[ProductResponse],
 )
 def list_products_endpoint(
+    search: str | None = Query(default=None),
+    category: str | None = Query(default=None),
     db: Session = Depends(get_db),
 ):
-    return list_all_products(db)
+    return list_all_products(
+        db,
+        search=search,
+        category=category,
+    )
+
+
+@router.get(
+    "/alerts/low-stock",
+    response_model=list[ProductResponse],
+)
+def low_stock_products_endpoint(
+    db: Session = Depends(get_db),
+):
+    return list_low_stock_products(db)
+
+
+@router.get(
+    "/alerts/expiring",
+    response_model=list[ProductResponse],
+)
+def expiring_products_endpoint(
+    days: int = Query(default=30, ge=0),
+    db: Session = Depends(get_db),
+):
+    return list_expiring_products(
+        db,
+        days,
+    )
 
 
 @router.get(
