@@ -2,6 +2,7 @@ from datetime import date, timedelta
 
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
+from app.exceptions import ProductNotFoundError
 
 from app.repositories.product_repository import (
     create_product,
@@ -41,10 +42,7 @@ def get_existing_product(
     product = get_product_by_id(db, product_id)
 
     if product is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Product not found.",
-        )
+         raise ProductNotFoundError()
 
     return product
 

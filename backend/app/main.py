@@ -1,10 +1,12 @@
 from fastapi import FastAPI
 from sqlalchemy import text
 from fastapi.middleware.cors import CORSMiddleware
-
+from fastapi import Request
+from fastapi.responses import JSONResponse
 from app.api.products import router as products_router
 from app.database.connection import Base, engine
-from app.models import Product
+from app.api.categories import router as categories_router
+from app.api.suppliers import router as suppliers_router
 
 
 Base.metadata.create_all(bind=engine)
@@ -28,8 +30,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.exception_handler(Exception)
+async def global_exception_handler(
+    request: Request,
+    exc: Exception,
+):
+    return JSONResponse(
+        status_code=500,
+        content={
+            "detail": "Internal server error."
+        },
+    )
+
 
 app.include_router(products_router)
+app.include_router(categories_router)
+app.include_router(suppliers_router)
 
 
 @app.get("/")
