@@ -13,10 +13,16 @@ __pycache__/
 .env
 **/.env
 
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+
 # Node
 node_modules/
 **/node_modules/
 dist/
+**/dist/
 
 # IDE
 .vscode/
